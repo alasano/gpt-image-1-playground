@@ -35,7 +35,7 @@ type DrawnPoint = {
     size: number;
 };
 
-const MAX_EDIT_IMAGES = 10;
+const MAX_EDIT_IMAGES = 1;
 
 const explicitModeClient = process.env.NEXT_PUBLIC_IMAGE_STORAGE_MODE;
 
@@ -221,11 +221,6 @@ export default function HomePage() {
                 return;
             }
 
-            if (editImageFiles.length >= MAX_EDIT_IMAGES) {
-                alert(`Cannot paste: Maximum of ${MAX_EDIT_IMAGES} images reached.`);
-                return;
-            }
-
             const items = event.clipboardData.items;
             let imageFound = false;
             for (let i = 0; i < items.length; i++) {
@@ -235,12 +230,15 @@ export default function HomePage() {
                         event.preventDefault();
                         imageFound = true;
 
+                        // Clean up previous preview URLs
+                        editSourceImagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+
                         const previewUrl = URL.createObjectURL(file);
 
-                        setEditImageFiles((prevFiles) => [...prevFiles, file]);
-                        setEditSourceImagePreviewUrls((prevUrls) => [...prevUrls, previewUrl]);
+                        setEditImageFiles([file]); // Replace with single file
+                        setEditSourceImagePreviewUrls([previewUrl]); // Replace with single preview
 
-                        console.log('Pasted image added:', file.name);
+                        console.log('Pasted image replaced existing:', file.name);
 
                         break;
                     }
@@ -256,7 +254,7 @@ export default function HomePage() {
         return () => {
             window.removeEventListener('paste', handlePaste);
         };
-    }, [mode, editImageFiles.length]);
+    }, [mode, editSourceImagePreviewUrls]);
 
     async function sha256Client(text: string): Promise<string> {
         const encoder = new TextEncoder();
@@ -753,7 +751,6 @@ export default function HomePage() {
                                 sourceImagePreviewUrls={editSourceImagePreviewUrls}
                                 setImageFiles={setEditImageFiles}
                                 setSourceImagePreviewUrls={setEditSourceImagePreviewUrls}
-                                maxImages={MAX_EDIT_IMAGES}
                                 editPrompt={editPrompt}
                                 setEditPrompt={setEditPrompt}
                                 editN={editN}

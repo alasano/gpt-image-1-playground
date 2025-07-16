@@ -1,13 +1,33 @@
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { AzureOpenAI, OpenAI } from 'openai';
 import path from 'path';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_API_BASE_URL
-});
+/**
+ * Creates an OpenAI client, using AzureOpenAI if AZURE_OPENAI_API_BASE_URL is configured,
+ * otherwise falls back to the standard OpenAI client.
+ */
+function createOpenAIClient(): OpenAI | AzureOpenAI {
+    const azureBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
+    
+    if (azureBaseUrl) {
+        console.log('Using Azure OpenAI client');
+        return new AzureOpenAI({
+            apiKey: process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+            baseURL: azureBaseUrl,
+            apiVersion: process.env.AZURE_OPENAI_APIVERSION || '2025-04-01-preview',
+        });
+    } else {
+        console.log('Using standard OpenAI client');
+        return new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+            baseURL: process.env.OPENAI_API_BASE_URL
+        });
+    }
+}
+
+// OpenAI client will be created when needed in the POST function
 
 const outputDir = path.resolve(process.cwd(), 'generated-images');
 
@@ -57,8 +77,15 @@ function sha256(data: string): string {
 export async function POST(request: NextRequest) {
     console.log('Received POST request to /api/images');
 
-    if (!process.env.OPENAI_API_KEY) {
-        console.error('OPENAI_API_KEY is not set.');
+    // Check for required API key based on configuration
+    const azureBaseUrl = process.env.AZURE_OPENAI_API_BASE_URL;
+    const hasRequiredApiKey = azureBaseUrl 
+        ? (process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY)
+        : process.env.OPENAI_API_KEY;
+
+    if (!hasRequiredApiKey) {
+        const missingKey = azureBaseUrl ? 'AZURE_OPENAI_API_KEY or OPENAI_API_KEY' : 'OPENAI_API_KEY';
+        console.error(`${missingKey} is not set.`);
         return NextResponse.json({ error: 'Server configuration error: API key not found.' }, { status: 500 });
     }
     try {
@@ -107,8 +134,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required parameters: mode and prompt' }, { status: 400 });
         }
 
+        // Create OpenAI client at runtime
+        const openai = createOpenAIClient();
+        
         let result: OpenAI.Images.ImagesResponse;
-        const model = 'gpt-image-1';
+        const model = process.env.MODEL_NAME || 'gpt-image-1';
 
         if (mode === 'generate') {
             const n = parseInt((formData.get('n') as string) || '1', 10);
@@ -163,22 +193,31 @@ export async function POST(request: NextRequest) {
             const params: OpenAI.Images.ImageEditParams = {
                 model,
                 prompt,
-                image: imageFiles,
+                image: imageFiles[0], // OpenAI API expects a single File, not an array
                 n: Math.max(1, Math.min(n || 1, 10)),
                 size: size === 'auto' ? undefined : size,
                 quality: quality === 'auto' ? undefined : quality
             };
 
+            
+            
             if (maskFile) {
                 params.mask = maskFile;
             }
-
+            
+            // If using Azure, ensure the API version is set (even when routing through OpenAI compliant endpoints)
+            const AzureAPIVersion = process.env.AZURE_OPENAI_APIVERSION
+            let options = {}
+            if (AzureAPIVersion) {
+                options = {"query": {"api-version": AzureAPIVersion}}
+            }
             console.log('Calling OpenAI edit with params:', {
                 ...params,
-                image: `[${imageFiles.map((f) => f.name).join(', ')}]`,
-                mask: maskFile ? maskFile.name : 'N/A'
+                image: imageFiles[0].name,
+                mask: maskFile ? maskFile.name : 'N/A',
+                options: options
             });
-            result = await openai.images.edit(params);
+            result = await openai.images.edit(params, options);
         } else {
             return NextResponse.json({ error: 'Invalid mode specified' }, { status: 400 });
         }

@@ -9,22 +9,22 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import {
-    Upload,
     Eraser,
-    Save,
-    Square,
+    Loader2,
+    Lock,
+    LockOpen,
     RectangleHorizontal,
     RectangleVertical,
+    Save,
+    ScanEye,
     Sparkles,
+    Square,
     Tally1,
     Tally2,
     Tally3,
-    Loader2,
-    X,
-    ScanEye,
+    Upload,
     UploadCloud,
-    Lock,
-    LockOpen
+    X
 } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
@@ -56,7 +56,6 @@ type EditingFormProps = {
     sourceImagePreviewUrls: string[];
     setImageFiles: React.Dispatch<React.SetStateAction<File[]>>;
     setSourceImagePreviewUrls: React.Dispatch<React.SetStateAction<string[]>>;
-    maxImages: number;
     editPrompt: string;
     setEditPrompt: React.Dispatch<React.SetStateAction<string>>;
     editN: number[];
@@ -117,7 +116,6 @@ export function EditingForm({
     sourceImagePreviewUrls,
     setImageFiles,
     setSourceImagePreviewUrls,
-    maxImages,
     editPrompt,
     setEditPrompt,
     editN,
@@ -326,38 +324,22 @@ export function EditingForm({
     };
 
     const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const newFiles = Array.from(event.target.files);
-            const totalFiles = imageFiles.length + newFiles.length;
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0]; // Only take the first file
 
-            if (totalFiles > maxImages) {
-                alert(`You can only select up to ${maxImages} images.`);
-                const allowedNewFiles = newFiles.slice(0, maxImages - imageFiles.length);
-                if (allowedNewFiles.length === 0) {
-                    event.target.value = '';
-                    return;
-                }
-                newFiles.splice(allowedNewFiles.length);
-            }
+            // Clean up previous preview URLs
+            sourceImagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
 
-            setImageFiles((prevFiles) => [...prevFiles, ...newFiles]);
+            setImageFiles([file]); // Replace with single file
 
-            const newFilePromises = newFiles.map((file) => {
-                return new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result as string);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            });
-
-            Promise.all(newFilePromises)
-                .then((newUrls) => {
-                    setSourceImagePreviewUrls((prevUrls) => [...prevUrls, ...newUrls]);
-                })
-                .catch((error) => {
-                    console.error('Error reading new image files:', error);
-                });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSourceImagePreviewUrls([reader.result as string]);
+            };
+            reader.onerror = (error) => {
+                console.error('Error reading image file:', error);
+            };
+            reader.readAsDataURL(file);
 
             event.target.value = '';
         }
@@ -489,7 +471,7 @@ export function EditingForm({
                     </div>
 
                     <div className='space-y-2'>
-                        <Label className='text-white'>Source Image(s) [Max: 10]</Label>
+                        <Label className='text-white'>Source Image</Label>
                         <Label
                             htmlFor='image-files-input'
                             className='flex h-10 w-full cursor-pointer items-center justify-between rounded-md border border-white/20 bg-black px-3 py-2 text-sm transition-colors hover:bg-white/5'>
@@ -502,9 +484,8 @@ export function EditingForm({
                             id='image-files-input'
                             type='file'
                             accept='image/png, image/jpeg, image/webp'
-                            multiple
                             onChange={handleImageFileChange}
-                            disabled={isLoading || imageFiles.length >= maxImages}
+                            disabled={isLoading}
                             className='sr-only'
                         />
                         {sourceImagePreviewUrls.length > 0 && (

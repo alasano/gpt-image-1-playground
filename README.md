@@ -54,6 +54,88 @@ You will be prompted to enter your `OPENAI_API_KEY` and `APP_PASSWORD` during th
 
 Note: If `NEXT_PUBLIC_IMAGE_STORAGE_MODE` is not set, the application will automatically detect if it's running on Vercel (using the `VERCEL` or `NEXT_PUBLIC_VERCEL_ENV` environment variables) and default to `indexeddb` mode in that case. Otherwise (e.g., running locally), it defaults to `fs` mode. You can always explicitly set the variable to `fs` or `indexeddb` to override this automatic behavior.
 
+## 🐳 Docker Deployment
+
+You can run the application using Docker with persistent storage for generated images.
+
+### Prerequisites
+
+*   [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+
+### 1. Set Up Environment Variables
+
+Create a `.env.local` file in the project root with your configuration:
+
+```dotenv
+OPENAI_API_KEY=your_openai_api_key_here
+# Optional: Azure OpenAI configuration
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+AZURE_OPENAI_API_BASE_URL=https://your-resource-name.cognitiveservices.azure.com/openai/
+AZURE_OPENAI_APIVERSION="2025-04-01-preview"
+# Optional: Password protection
+APP_PASSWORD=your_password_here
+```
+
+### 2. Run with Docker Compose
+
+```bash
+# Build and start the container
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the container
+docker-compose down
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
+
+### 3. Persistent Image Storage
+
+Generated images are automatically persisted using a Docker named volume (`generated-images`). This means:
+
+*   Images will persist between container restarts
+*   Images are stored outside the container filesystem
+*   You can backup/restore the volume as needed
+
+### 4. Docker Volume Management
+
+```bash
+# List volumes
+docker volume ls
+
+# Inspect the images volume
+docker volume inspect gpt-image-1-playground_generated-images
+
+# Backup images (optional)
+docker run --rm -v gpt-image-1-playground_generated-images:/data -v $(pwd):/backup alpine tar czf /backup/images-backup.tar.gz -C /data .
+
+# Restore images (optional)
+docker run --rm -v gpt-image-1-playground_generated-images:/data -v $(pwd):/backup alpine tar xzf /backup/images-backup.tar.gz -C /data
+```
+
+### Alternative: Docker without Compose
+
+If you prefer to use Docker directly:
+
+```bash
+# Build the image
+docker build -t gpt-image-playground .
+
+# Create a volume for persistent storage
+docker volume create generated-images
+
+# Run the container
+docker run -d \
+  --name gpt-image-playground \
+  -p 3000:3000 \
+  -v generated-images:/app/generated-images \
+  --env-file .env.local \
+  -e NEXT_PUBLIC_IMAGE_STORAGE_MODE=fs \
+  gpt-image-playground
+```
+
 ## 🚀 Getting Started [Local Deployment]
 
 Follow these steps to get the playground running locally.
@@ -98,6 +180,23 @@ When this variable is set to `indexeddb`:
 If this variable is **not set** or has any other value, the application defaults to the standard behavior of saving images to the `./generated-images` directory on the server's filesystem.
 
 **Note:** If `NEXT_PUBLIC_IMAGE_STORAGE_MODE` is not set, the application will automatically detect if it's running on Vercel (using the `VERCEL` or `NEXT_PUBLIC_VERCEL_ENV` environment variables) and default to `indexeddb` mode in that case. Otherwise (e.g., running locally), it defaults to `fs` mode. You can always explicitly set the variable to `fs` or `indexeddb` to override this automatic behavior.
+
+#### 🟡 (Optional) Use Azure OpenAI
+
+If you want to use Azure OpenAI instead of the standard OpenAI API, you can configure the following environment variables in your `.env.local` file:
+
+```dotenv
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+AZURE_OPENAI_API_BASE_URL=your_azure_openai_api_base_url_here
+AZURE_OPENAI_APIVERSION="2025-04-01-preview"
+```
+
+**Azure OpenAI Configuration Details:**
+- `AZURE_OPENAI_API_KEY`: Your Azure OpenAI service API key
+- `AZURE_OPENAI_API_BASE_URL`: Your Azure OpenAI endpoint URL (e.g., `https://your-resource-name.cognitiveservices.azure.com/openai/`)
+- `AZURE_OPENAI_APIVERSION`: The API version to use (default: `"2025-04-01-preview"`)
+
+When these Azure variables are set, the application will automatically use Azure OpenAI instead of the standard OpenAI API. Make sure your Azure OpenAI deployment includes the `gpt-image-1` model.
 
 #### 🟡 (Optional) Use a Custom API Endpoint
 

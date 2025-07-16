@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  gpt-image-playground:
+    build: .
+    volumes:
+      # Persist generated images on a named volume
+      - generated-images:/app/generated-images
+    environment:
+      - NEXT_PUBLIC_IMAGE_STORAGE_MODE=fs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/auth-status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  generated-images:
