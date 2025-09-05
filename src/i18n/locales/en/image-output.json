@@ -1,0 +1,19 @@
+{
+  "altText": "Generated image output",
+  "baseImageAlt": "Base image for editing",
+  "generatedImageAlt": "Generated image {{index}}",
+  "thumbnailAlt": "Thumbnail {{index}}",
+  "loading": {
+    "editing": "Editing image...",
+    "generating": "Generating image..."
+  },
+  "errors": {
+    "displayError": "Error displaying image."
+  },
+  "placeholder": "Your generated image will appear here.",
+  "buttons": {
+    "showGridView": "Show grid view",
+    "selectImage": "Select image {{index}}",
+    "sendToEdit": "Send to Edit"
+  }
+}

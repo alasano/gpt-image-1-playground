@@ -1,0 +1,25 @@
+{
+  "languages": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "generate": "Generate",
+  "edit": "Edit",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "browse": "Browse...",
+    "upload": "Upload"
+  },
+  "status": {
+    "loading": "Loading...",
+    "generating": "Generating...",
+    "editing": "Editing...",
+    "saved": "Saved",
+    "success": "Success!"
+  }
+}

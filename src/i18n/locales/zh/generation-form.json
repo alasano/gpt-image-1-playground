@@ -1,0 +1,57 @@
+{
+  "title": "生成图像",
+  "description": "使用 gpt-image-1 从文本提示创建新图像。",
+  "form": {
+    "prompt": {
+      "label": "提示词",
+      "placeholder": "例如：一只在太空中漂浮的逼真猫宇航员"
+    },
+    "numberOfImages": {
+      "label": "图像数量: {{count}}"
+    },
+    "size": {
+      "label": "尺寸",
+      "options": {
+        "auto": "自动",
+        "square": "正方形",
+        "landscape": "横向",
+        "portrait": "纵向"
+      }
+    },
+    "quality": {
+      "label": "质量",
+      "options": {
+        "auto": "自动",
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      }
+    },
+    "background": {
+      "label": "背景",
+      "options": {
+        "auto": "自动",
+        "opaque": "不透明",
+        "transparent": "透明"
+      }
+    },
+    "outputFormat": {
+      "label": "输出格式"
+    },
+    "compression": {
+      "label": "压缩: {{value}}%"
+    },
+    "moderation": {
+      "label": "内容审核等级",
+      "options": {
+        "auto": "自动",
+        "low": "低"
+      }
+    }
+  },
+  "buttons": {
+    "generate": "生成",
+    "generating": "生成中...",
+    "configurePassword": "配置密码"
+  }
+}

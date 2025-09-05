@@ -1,0 +1,63 @@
+{
+  "title": "History",
+  "empty": "Generated images will appear here.",
+  "buttons": {
+    "clear": "Clear",
+    "showPrompt": "Show Prompt",
+    "showCostBreakdown": "Show cost breakdown",
+    "showTotalCost": "Show total cost summary",
+    "delete": "Delete history item"
+  },
+  "totalCost": "Total Cost: ${{cost}}",
+  "metadata": {
+    "time": "Time:",
+    "quality": "Quality:",
+    "background": "BG:",
+    "moderation": "Mod:",
+    "create": "Create",
+    "edit": "Edit",
+    "file": "file",
+    "db": "db"
+  },
+  "dialogs": {
+    "totalCostSummary": {
+      "title": "Total Cost Summary",
+      "description": "A summary of the total estimated cost for all generated images in the history.",
+      "pricing": "Pricing for gpt-image-1:",
+      "textInput": "Text Input: $5 / 1M tokens",
+      "imageInput": "Image Input: $10 / 1M tokens",
+      "imageOutput": "Image Output: $40 / 1M tokens",
+      "totalImagesGenerated": "Total Images Generated:",
+      "averageCostPerImage": "Average Cost Per Image:",
+      "totalEstimatedCost": "Total Estimated Cost:"
+    },
+    "costBreakdown": {
+      "title": "Cost Breakdown",
+      "description": "Estimated cost breakdown for this image generation.",
+      "pricing": "Pricing for gpt-image-1:",
+      "textInput": "Text Input: $5 / 1M tokens",
+      "imageInput": "Image Input: $10 / 1M tokens",
+      "imageOutput": "Image Output: $40 / 1M tokens",
+      "textInputTokens": "Text Input Tokens:",
+      "imageInputTokens": "Image Input Tokens:",
+      "imageOutputTokens": "Image Output Tokens:",
+      "totalEstimatedCost": "Total Estimated Cost:"
+    },
+    "prompt": {
+      "title": "Prompt",
+      "description": "The full prompt used to generate this image batch.",
+      "noPrompt": "No prompt recorded."
+    },
+    "confirmDeletion": {
+      "title": "Confirm Deletion",
+      "description": "Are you sure you want to delete this history entry? This will remove {{count}} image(s). This action cannot be undone.",
+      "dontAskAgain": "Don't ask me again",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
+  },
+  "imageAlt": {
+    "preview": "Preview for batch generated at {{date}}",
+    "viewBatch": "View image batch from {{date}}"
+  }
+}

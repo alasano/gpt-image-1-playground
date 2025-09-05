@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type HistoryPanelProps = {
     history: HistoryMetadata[];
@@ -67,6 +68,7 @@ export function HistoryPanel({
     deletePreferenceDialogValue,
     onDeletePreferenceDialogChange
 }: HistoryPanelProps) {
+    const { t } = useTranslation('historyPanel');
     const [openPromptDialogTimestamp, setOpenPromptDialogTimestamp] = React.useState<number | null>(null);
     const [openCostDialogTimestamp, setOpenCostDialogTimestamp] = React.useState<number | null>(null);
     const [isTotalCostDialogOpen, setIsTotalCostDialogOpen] = React.useState(false);
@@ -102,42 +104,42 @@ export function HistoryPanel({
         <Card className='flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-black'>
             <CardHeader className='flex flex-row items-center justify-between gap-4 border-b border-white/10 px-4 py-3'>
                 <div className='flex items-center gap-2'>
-                    <CardTitle className='text-lg font-medium text-white'>History</CardTitle>
+                    <CardTitle className='text-lg font-medium text-white'>{t('title')}</CardTitle>
                     {totalCost > 0 && (
                         <Dialog open={isTotalCostDialogOpen} onOpenChange={setIsTotalCostDialogOpen}>
                             <DialogTrigger asChild>
                                 <button
                                     className='mt-0.5 flex items-center gap-1 rounded-full bg-green-600/80 px-1.5 py-0.5 text-[12px] text-white transition-colors hover:bg-green-500/90'
-                                    aria-label='Show total cost summary'>
-                                    Total Cost: ${totalCost.toFixed(4)}
+                                    aria-label={t('showTotalCostSummary')}>
+                                    {t('totalCost')}: ${totalCost.toFixed(4)}
                                 </button>
                             </DialogTrigger>
                             <DialogContent className='border-neutral-700 bg-neutral-900 text-white sm:max-w-[450px]'>
                                 <DialogHeader>
-                                    <DialogTitle className='text-white'>Total Cost Summary</DialogTitle>
+                                    <DialogTitle className='text-white'>{t('totalCostSummary')}</DialogTitle>
                                     {/* Add sr-only description for accessibility */}
                                     <DialogDescription className='sr-only'>
-                                        A summary of the total estimated cost for all generated images in the history.
+                                        {t('totalCostSummaryDescription')}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className='space-y-1 pt-1 text-xs text-neutral-400'>
-                                    <p>Pricing for gpt-image-1:</p>
+                                    <p>{t('pricingInfo')}</p>
                                     <ul className='list-disc pl-4'>
-                                        <li>Text Input: $5 / 1M tokens</li>
-                                        <li>Image Input: $10 / 1M tokens</li>
-                                        <li>Image Output: $40 / 1M tokens</li>
+                                        <li>{t('textInputPricing')}</li>
+                                        <li>{t('imageInputPricing')}</li>
+                                        <li>{t('imageOutputPricing')}</li>
                                     </ul>
                                 </div>
                                 <div className='space-y-2 py-4 text-sm text-neutral-300'>
                                     <div className='flex justify-between'>
-                                        <span>Total Images Generated:</span> <span>{totalImages.toLocaleString()}</span>
+                                        <span>{t('totalImagesGenerated')}:</span> <span>{totalImages.toLocaleString()}</span>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <span>Average Cost Per Image:</span> <span>${averageCost.toFixed(4)}</span>
+                                        <span>{t('averageCostPerImage')}:</span> <span>${averageCost.toFixed(4)}</span>
                                     </div>
                                     <hr className='my-2 border-neutral-700' />
                                     <div className='flex justify-between font-medium text-white'>
-                                        <span>Total Estimated Cost:</span>
+                                        <span>{t('totalEstimatedCost')}:</span>
                                         <span>${totalCost.toFixed(4)}</span>
                                     </div>
                                 </div>
@@ -148,7 +150,7 @@ export function HistoryPanel({
                                             variant='secondary'
                                             size='sm'
                                             className='bg-neutral-700 text-neutral-200 hover:bg-neutral-600'>
-                                            Close
+                                            {t('close')}
                                         </Button>
                                     </DialogClose>
                                 </DialogFooter>
@@ -162,14 +164,14 @@ export function HistoryPanel({
                         size='sm'
                         onClick={onClearHistory}
                         className='h-auto rounded-md px-2 py-1 text-white/60 hover:bg-white/10 hover:text-white'>
-                        Clear
+                        {t('clear')}
                     </Button>
                 )}
             </CardHeader>
             <CardContent className='flex-grow overflow-y-auto p-4'>
                 {history.length === 0 ? (
                     <div className='flex h-full items-center justify-center text-white/40'>
-                        <p>Generated images will appear here.</p>
+                        <p>{t('emptyMessage')}</p>
                     </div>
                 ) : (
                     <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
@@ -221,7 +223,7 @@ export function HistoryPanel({
                                                 ) : (
                                                     <SparklesIcon size={12} />
                                                 )}
-                                                {item.mode === 'edit' ? 'Edit' : 'Create'}
+                                                {item.mode === 'edit' ? t('edit') : t('create')}
                                             </div>
                                             {isMultiImage && (
                                                 <div className='pointer-events-none absolute right-1 bottom-1 z-10 flex items-center gap-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[12px] text-white'>
@@ -257,29 +259,29 @@ export function HistoryPanel({
                                                             setOpenCostDialogTimestamp(itemKey);
                                                         }}
                                                         className='absolute top-1 right-1 z-20 flex items-center gap-0.5 rounded-full bg-green-600/80 px-1.5 py-0.5 text-[11px] text-white transition-colors hover:bg-green-500/90'
-                                                        aria-label='Show cost breakdown'>
+                                                        aria-label={t('showCostBreakdown')}>
                                                         <DollarSign size={12} />
                                                         {item.costDetails.estimated_cost_usd.toFixed(4)}
                                                     </button>
                                                 </DialogTrigger>
                                                 <DialogContent className='border-neutral-700 bg-neutral-900 text-white sm:max-w-[450px]'>
                                                     <DialogHeader>
-                                                        <DialogTitle className='text-white'>Cost Breakdown</DialogTitle>
+                                                        <DialogTitle className='text-white'>{t('costBreakdown')}</DialogTitle>
                                                         <DialogDescription className='sr-only'>
-                                                            Estimated cost breakdown for this image generation.
+                                                            {t('costBreakdownDescription')}
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <div className='space-y-1 pt-1 text-xs text-neutral-400'>
-                                                        <p>Pricing for gpt-image-1:</p>
+                                                        <p>{t('pricingInfo')}</p>
                                                         <ul className='list-disc pl-4'>
-                                                            <li>Text Input: $5 / 1M tokens</li>
-                                                            <li>Image Input: $10 / 1M tokens</li>
-                                                            <li>Image Output: $40 / 1M tokens</li>
+                                                            <li>{t('textInputPricing')}</li>
+                                                            <li>{t('imageInputPricing')}</li>
+                                                            <li>{t('imageOutputPricing')}</li>
                                                         </ul>
                                                     </div>
                                                     <div className='space-y-2 py-4 text-sm text-neutral-300'>
                                                         <div className='flex justify-between'>
-                                                            <span>Text Input Tokens:</span>{' '}
+                                                            <span>{t('textInputTokens')}:</span>{' '}
                                                             <span>
                                                                 {item.costDetails.text_input_tokens.toLocaleString()}{' '}
                                                                 (~$
@@ -292,7 +294,7 @@ export function HistoryPanel({
                                                         </div>
                                                         {item.costDetails.image_input_tokens > 0 && (
                                                             <div className='flex justify-between'>
-                                                                <span>Image Input Tokens:</span>{' '}
+                                                                <span>{t('imageInputTokens')}:</span>{' '}
                                                                 <span>
                                                                     {item.costDetails.image_input_tokens.toLocaleString()}{' '}
                                                                     (~$
@@ -305,7 +307,7 @@ export function HistoryPanel({
                                                             </div>
                                                         )}
                                                         <div className='flex justify-between'>
-                                                            <span>Image Output Tokens:</span>{' '}
+                                                            <span>{t('imageOutputTokens')}:</span>{' '}
                                                             <span>
                                                                 {item.costDetails.image_output_tokens.toLocaleString()}{' '}
                                                                 (~$
@@ -318,7 +320,7 @@ export function HistoryPanel({
                                                         </div>
                                                         <hr className='my-2 border-neutral-700' />
                                                         <div className='flex justify-between font-medium text-white'>
-                                                            <span>Total Estimated Cost:</span>
+                                                            <span>{t('totalEstimatedCost')}:</span>
                                                             <span>
                                                                 ${item.costDetails.estimated_cost_usd.toFixed(4)}
                                                             </span>
@@ -331,7 +333,7 @@ export function HistoryPanel({
                                                                 variant='secondary'
                                                                 size='sm'
                                                                 className='bg-neutral-700 text-neutral-200 hover:bg-neutral-600'>
-                                                                Close
+                                                                {t('close')}
                                                             </Button>
                                                         </DialogClose>
                                                     </DialogFooter>
@@ -342,11 +344,11 @@ export function HistoryPanel({
 
                                     <div className='space-y-1 rounded-b-md border border-t-0 border-neutral-700 bg-black p-2 text-xs text-white/60'>
                                         <p title={`Generated on: ${new Date(item.timestamp).toLocaleString()}`}>
-                                            <span className='font-medium text-white/80'>Time:</span>{' '}
+                                            <span className='font-medium text-white/80'>{t('time')}:</span>{' '}
                                             {formatDuration(item.durationMs)}
                                         </p>
                                         <p>
-                                            <span className='font-medium text-white/80'>Quality:</span> {item.quality}
+                                            <span className='font-medium text-white/80'>{t('quality')}:</span> {item.quality}
                                         </p>
                                         <p>
                                             <span className='font-medium text-white/80'>BG:</span> {item.background}
@@ -364,20 +366,20 @@ export function HistoryPanel({
                                                     <Button
                                                         variant='outline'
                                                         size='sm'
-                                                        className='h-6 flex-grow border-white/20 px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white'
-                                                        onClick={() => setOpenPromptDialogTimestamp(itemKey)}>
-                                                        Show Prompt
+                                        className='h-6 flex-grow border-white/20 px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white'
+                                        onClick={() => setOpenPromptDialogTimestamp(itemKey)}>
+                                        {t('showPrompt')}
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className='border-neutral-700 bg-neutral-900 text-white sm:max-w-[625px]'>
                                                     <DialogHeader>
-                                                        <DialogTitle className='text-white'>Prompt</DialogTitle>
+                                                        <DialogTitle className='text-white'>{t('prompt')}</DialogTitle>
                                                         <DialogDescription className='sr-only'>
-                                                            The full prompt used to generate this image batch.
+                                                            {t('promptDescription')}
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <div className='max-h-[400px] overflow-y-auto rounded-md border border-neutral-600 bg-neutral-800 p-3 py-4 text-sm text-neutral-300'>
-                                                        {item.prompt || 'No prompt recorded.'}
+                                                        {item.prompt || t('noPromptRecorded')}
                                                     </div>
                                                     <DialogFooter>
                                                         <Button
@@ -390,7 +392,7 @@ export function HistoryPanel({
                                                             ) : (
                                                                 <Copy className='mr-2 h-4 w-4' />
                                                             )}
-                                                            {copiedTimestamp === itemKey ? 'Copied!' : 'Copy'}
+                                                            {copiedTimestamp === itemKey ? t('copied') : t('copy')}
                                                         </Button>
                                                         <DialogClose asChild>
                                                             <Button
@@ -398,7 +400,7 @@ export function HistoryPanel({
                                                                 variant='secondary'
                                                                 size='sm'
                                                                 className='bg-neutral-700 text-neutral-200 hover:bg-neutral-600'>
-                                                                Close
+                                                                {t('close')}
                                                             </Button>
                                                         </DialogClose>
                                                     </DialogFooter>
@@ -416,19 +418,17 @@ export function HistoryPanel({
                                                             e.stopPropagation();
                                                             onDeleteItemRequest(item);
                                                         }}
-                                                        aria-label='Delete history item'>
+                                                        aria-label={t('deleteHistoryItem')}>
                                                         <Trash2 size={14} />
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className='border-neutral-700 bg-neutral-900 text-white sm:max-w-md'>
                                                     <DialogHeader>
                                                         <DialogTitle className='text-white'>
-                                                            Confirm Deletion
+                                                            {t('confirmDeletion')}
                                                         </DialogTitle>
                                                         <DialogDescription className='pt-2 text-neutral-300'>
-                                                            Are you sure you want to delete this history entry? This
-                                                            will remove {item.images.length} image(s). This action
-                                                            cannot be undone.
+                                                            {t('deleteConfirmationMessage', { count: item.images.length })}
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <div className='flex items-center space-x-2 py-2'>
@@ -443,7 +443,7 @@ export function HistoryPanel({
                                                         <label
                                                             htmlFor={`dont-ask-${item.timestamp}`}
                                                             className='text-sm leading-none font-medium text-neutral-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                                                            Don&apos;t ask me again
+                                                            {t('dontAskAgain')}
                                                         </label>
                                                     </div>
                                                     <DialogFooter className='gap-2 sm:justify-end'>
@@ -453,7 +453,7 @@ export function HistoryPanel({
                                                             size='sm'
                                                             onClick={onCancelDeletion}
                                                             className='border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:text-white'>
-                                                            Cancel
+                                                            {t('cancel')}
                                                         </Button>
                                                         <Button
                                                             type='button'
@@ -461,7 +461,7 @@ export function HistoryPanel({
                                                             size='sm'
                                                             onClick={onConfirmDeletion}
                                                             className='bg-red-600 text-white hover:bg-red-500'>
-                                                            Delete
+                                                            {t('delete')}
                                                         </Button>
                                                     </DialogFooter>
                                                 </DialogContent>

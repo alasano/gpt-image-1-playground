@@ -1,0 +1,19 @@
+{
+  "altText": "生成的图像输出",
+  "baseImageAlt": "用于编辑的基础图像",
+  "generatedImageAlt": "生成的图像 {{index}}",
+  "thumbnailAlt": "缩略图 {{index}}",
+  "loading": {
+    "editing": "正在编辑图像...",
+    "generating": "正在生成图像..."
+  },
+  "errors": {
+    "displayError": "显示图像时出错。"
+  },
+  "placeholder": "您生成的图像将显示在这里。",
+  "buttons": {
+    "showGridView": "显示网格视图",
+    "selectImage": "选择图像 {{index}}",
+    "sendToEdit": "发送到编辑"
+  }
+}

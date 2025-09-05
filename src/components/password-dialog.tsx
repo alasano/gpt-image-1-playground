@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PasswordDialogProps {
     isOpen: boolean;
@@ -24,9 +25,10 @@ export function PasswordDialog({
     isOpen,
     onOpenChange,
     onSave,
-    title = 'Configure Password',
+    title,
     description
 }: PasswordDialogProps) {
+    const { t } = useTranslation(['passwordDialog', 'common']);
     const [currentPassword, setCurrentPassword] = React.useState('');
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -48,8 +50,8 @@ export function PasswordDialog({
         <Dialog open={isOpen} onOpenChange={handleDialogClose}>
             <DialogContent className='border-white/20 bg-black text-white sm:max-w-[425px]'>
                 <DialogHeader>
-                    <DialogTitle className='text-white'>{title}</DialogTitle>
-                    {description && <DialogDescription className='text-white/60'>{description}</DialogDescription>}
+                    <DialogTitle className='text-white'>{title || t('title')}</DialogTitle>
+                    {(description || t('description')) && <DialogDescription className='text-white/60'>{description || t('description')}</DialogDescription>}
                 </DialogHeader>
                 <div className='grid gap-4 py-4'>
                     <div className='grid grid-cols-1 items-center gap-4'>
@@ -57,7 +59,7 @@ export function PasswordDialog({
                             ref={inputRef}
                             id='password-input'
                             type='password'
-                            placeholder='Enter your password'
+                            placeholder={t('form.passwordInput.placeholder')}
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             className='col-span-1 border-white/20 bg-black text-white placeholder:text-white/40 focus:border-white/50 focus:ring-white/50'
@@ -76,7 +78,7 @@ export function PasswordDialog({
                         onClick={handleSave}
                         disabled={!currentPassword.trim()}
                         className='bg-white px-6 text-black hover:bg-white/90 disabled:bg-white/10 disabled:text-white/40'>
-                        Save
+                        {t('buttons.save')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

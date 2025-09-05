@@ -1,0 +1,67 @@
+{
+  "title": "编辑图像",
+  "description": "使用 gpt-image-1 修改图像。",
+  "form": {
+    "prompt": {
+      "label": "提示词",
+      "placeholder": "例如：给主体添加一顶派对帽"
+    },
+    "sourceImages": {
+      "label": "源图像 [最多: 10]",
+      "noFileSelected": "未选择文件。",
+      "fileSelected": "{{filename}}",
+      "filesSelected": "已选择 {{count}} 个文件",
+      "maxImagesReached": "您最多只能选择 {{max}} 张图像。",
+      "removeImageAria": "删除图像 {{index}}"
+    },
+    "mask": {
+      "label": "遮罩",
+      "createMask": "创建遮罩",
+      "editSavedMask": "编辑已保存的遮罩",
+      "closeMaskEditor": "关闭遮罩编辑器",
+      "savedIndicator": "（已保存）",
+      "instructions": "在下面的图像上绘制以标记要编辑的区域（绘制的区域在遮罩中变为透明）。",
+      "brushSize": "画笔大小: {{size}}px",
+      "uploadMask": "上传遮罩",
+      "clearMask": "清除",
+      "saveMask": "保存遮罩",
+      "generatedMaskPreview": "生成的遮罩预览：",
+      "generatingPreview": "正在生成遮罩预览...",
+      "maskSavedSuccess": "遮罩保存成功！",
+      "maskApplied": "已应用遮罩: {{filename}}",
+      "invalidFileType": "无效的文件类型。请上传 PNG 文件作为遮罩。",
+      "dimensionMismatch": "遮罩尺寸 ({{maskWidth}}x{{maskHeight}}) 必须与源图像尺寸 ({{imageWidth}}x{{imageHeight}}) 匹配。",
+      "failedToLoadMask": "加载上传的遮罩图像以检查尺寸失败。"
+    },
+    "size": {
+      "label": "尺寸",
+      "options": {
+        "auto": "自动",
+        "square": "正方形",
+        "landscape": "横向",
+        "portrait": "纵向"
+      }
+    },
+    "quality": {
+      "label": "质量",
+      "options": {
+        "auto": "自动",
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      }
+    },
+    "numberOfImages": {
+      "label": "图像数量: {{count}}"
+    }
+  },
+  "buttons": {
+    "edit": "编辑图像",
+    "editing": "编辑中...",
+    "configurePassword": "配置密码"
+  },
+  "validation": {
+    "selectAtLeastOneImage": "请选择至少一张图像进行编辑。",
+    "saveMaskBeforeSubmit": "请在提交前保存您绘制的遮罩。"
+  }
+}

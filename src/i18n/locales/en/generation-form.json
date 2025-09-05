@@ -1,0 +1,57 @@
+{
+  "title": "Generate Image",
+  "description": "Create a new image from a text prompt using gpt-image-1.",
+  "form": {
+    "prompt": {
+      "label": "Prompt",
+      "placeholder": "e.g., A photorealistic cat astronaut floating in space"
+    },
+    "numberOfImages": {
+      "label": "Number of Images: {{count}}"
+    },
+    "size": {
+      "label": "Size",
+      "options": {
+        "auto": "Auto",
+        "square": "Square",
+        "landscape": "Landscape",
+        "portrait": "Portrait"
+      }
+    },
+    "quality": {
+      "label": "Quality",
+      "options": {
+        "auto": "Auto",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
+    "background": {
+      "label": "Background",
+      "options": {
+        "auto": "Auto",
+        "opaque": "Opaque",
+        "transparent": "Transparent"
+      }
+    },
+    "outputFormat": {
+      "label": "Output Format"
+    },
+    "compression": {
+      "label": "Compression: {{value}}%"
+    },
+    "moderation": {
+      "label": "Moderation Level",
+      "options": {
+        "auto": "Auto",
+        "low": "Low"
+      }
+    }
+  },
+  "buttons": {
+    "generate": "Generate",
+    "generating": "Generating...",
+    "configurePassword": "Configure Password"
+  }
+}

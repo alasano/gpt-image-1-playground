@@ -1,0 +1,67 @@
+{
+  "title": "Edit Image",
+  "description": "Modify an image using gpt-image-1.",
+  "form": {
+    "prompt": {
+      "label": "Prompt",
+      "placeholder": "e.g., Add a party hat to the main subject"
+    },
+    "sourceImages": {
+      "label": "Source Image(s) [Max: 10]",
+      "noFileSelected": "No file selected.",
+      "fileSelected": "{{filename}}",
+      "filesSelected": "{{count}} files selected",
+      "maxImagesReached": "You can only select up to {{max}} images.",
+      "removeImageAria": "Remove image {{index}}"
+    },
+    "mask": {
+      "label": "Mask",
+      "createMask": "Create Mask",
+      "editSavedMask": "Edit Saved Mask",
+      "closeMaskEditor": "Close Mask Editor",
+      "savedIndicator": "(Saved)",
+      "instructions": "Draw on the image below to mark areas for editing (drawn areas become transparent in the mask).",
+      "brushSize": "Brush Size: {{size}}px",
+      "uploadMask": "Upload Mask",
+      "clearMask": "Clear",
+      "saveMask": "Save Mask",
+      "generatedMaskPreview": "Generated Mask Preview:",
+      "generatingPreview": "Generating mask preview...",
+      "maskSavedSuccess": "Mask saved successfully!",
+      "maskApplied": "Mask applied: {{filename}}",
+      "invalidFileType": "Invalid file type. Please upload a PNG file for the mask.",
+      "dimensionMismatch": "Mask dimensions ({{maskWidth}}x{{maskHeight}}) must match the source image dimensions ({{imageWidth}}x{{imageHeight}}).",
+      "failedToLoadMask": "Failed to load the uploaded mask image to check dimensions."
+    },
+    "size": {
+      "label": "Size",
+      "options": {
+        "auto": "Auto",
+        "square": "Square",
+        "landscape": "Landscape",
+        "portrait": "Portrait"
+      }
+    },
+    "quality": {
+      "label": "Quality",
+      "options": {
+        "auto": "Auto",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
+    "numberOfImages": {
+      "label": "Number of Images: {{count}}"
+    }
+  },
+  "buttons": {
+    "edit": "Edit Image",
+    "editing": "Editing...",
+    "configurePassword": "Configure Password"
+  },
+  "validation": {
+    "selectAtLeastOneImage": "Please select at least one image to edit.",
+    "saveMaskBeforeSubmit": "Please save the mask you have drawn before submitting."
+  }
+}
