@@ -166,7 +166,6 @@ export async function POST(request: NextRequest) {
             // Handle streaming mode for generation
             if (streamEnabled) {
                 const actualPartialImages = Math.max(1, Math.min(partialImagesCount, 3)) as 1 | 2 | 3;
-                console.log(`[Streaming] Calling OpenAI generate with streaming. partial_images requested: ${actualPartialImages}`);
 
                 const streamParams = {
                     ...baseParams,
@@ -194,13 +193,7 @@ export async function POST(request: NextRequest) {
                             let imageIndex = 0;
 
                             for await (const event of stream) {
-                                console.log(`[Streaming] Event received: ${event.type}`, {
-                                    partial_image_index: 'partial_image_index' in event ? event.partial_image_index : undefined,
-                                    hasB64: 'b64_json' in event ? !!event.b64_json : false
-                                });
-
                                 if (event.type === 'image_generation.partial_image') {
-                                    console.log(`[Streaming] Partial image ${event.partial_image_index} received, b64 length: ${event.b64_json?.length || 0}`);
                                     const partialEvent: StreamingEvent = {
                                         type: 'partial_image',
                                         index: imageIndex,
@@ -209,7 +202,6 @@ export async function POST(request: NextRequest) {
                                     };
                                     controller.enqueue(encoder.encode(`data: ${JSON.stringify(partialEvent)}\n\n`));
                                 } else if (event.type === 'image_generation.completed') {
-                                    console.log(`[Streaming] Completed image received, b64 length: ${event.b64_json?.length || 0}`);
                                     const currentIndex = imageIndex;
                                     const filename = `${timestamp}-${currentIndex}.${fileExtension}`;
 
@@ -249,7 +241,6 @@ export async function POST(request: NextRequest) {
                             }
 
                             // Send final done event with all images and usage
-                            console.log(`[Streaming Generate] Stream complete. Total completed images: ${completedImages.length}`);
                             const doneEvent: StreamingEvent = {
                                 type: 'done',
                                 images: completedImages,

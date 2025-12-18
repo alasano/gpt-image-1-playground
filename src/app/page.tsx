@@ -140,7 +140,6 @@ export default function HomePage() {
 
     React.useEffect(() => {
         return () => {
-            console.log('Revoking blob URLs:', Object.keys(blobUrlCache).length);
             Object.values(blobUrlCache).forEach((url) => {
                 if (url.startsWith('blob:')) {
                     URL.revokeObjectURL(url);
@@ -237,27 +236,20 @@ export default function HomePage() {
             }
 
             const items = event.clipboardData.items;
-            let imageFound = false;
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
                     const file = items[i].getAsFile();
                     if (file) {
                         event.preventDefault();
-                        imageFound = true;
 
                         const previewUrl = URL.createObjectURL(file);
 
                         setEditImageFiles((prevFiles) => [...prevFiles, file]);
                         setEditSourceImagePreviewUrls((prevUrls) => [...prevUrls, previewUrl]);
 
-                        console.log('Pasted image added:', file.name);
-
                         break;
                     }
                 }
-            }
-            if (!imageFound) {
-                console.log('Paste event did not contain a recognized image file.');
             }
         };
 
@@ -289,7 +281,6 @@ export default function HomePage() {
             setError(null);
             setIsPasswordDialogOpen(false);
             if (passwordDialogContext === 'retry' && lastApiCallArgs) {
-                console.log('Retrying API call after password save...');
                 await handleApiCall(...lastApiCallArgs);
             }
         } catch (e) {
@@ -369,8 +360,6 @@ export default function HomePage() {
             }
         }
 
-        console.log('Sending request to /api/images with mode:', mode, 'streaming:', enableStreaming);
-
         try {
             const response = await fetch('/api/images', {
                 method: 'POST',
@@ -380,8 +369,6 @@ export default function HomePage() {
             // Check if response is SSE (streaming)
             const contentType = response.headers.get('content-type');
             if (contentType?.includes('text/event-stream')) {
-                console.log('Handling SSE streaming response...');
-
                 if (!response.body) {
                     throw new Error('Response body is null');
                 }
@@ -405,7 +392,6 @@ export default function HomePage() {
                             const jsonStr = line.slice(6);
                             try {
                                 const event = JSON.parse(jsonStr);
-                                console.log('SSE Event:', event.type);
 
                                 if (event.type === 'partial_image') {
                                     // Update streaming preview with partial image
@@ -416,15 +402,11 @@ export default function HomePage() {
                                         newMap.set(imageIndex, dataUrl);
                                         return newMap;
                                     });
-                                    console.log(`Partial image ${event.partial_image_index} for index ${imageIndex}`);
-                                } else if (event.type === 'completed') {
-                                    console.log(`Completed image ${event.index}: ${event.filename}`);
                                 } else if (event.type === 'error') {
                                     throw new Error(event.error || 'Streaming error occurred');
                                 } else if (event.type === 'done') {
                                     // Finalize with all completed images
                                     durationMs = Date.now() - startTime;
-                                    console.log(`Streaming completed. Duration: ${durationMs}ms`);
 
                                     if (event.images && event.images.length > 0) {
                                         let historyQuality: GenerationFormData['quality'] = 'auto';
@@ -471,7 +453,6 @@ export default function HomePage() {
                                         let newImageBatchPromises: Promise<{ path: string; filename: string } | null>[] =
                                             [];
                                         if (effectiveStorageModeClient === 'indexeddb') {
-                                            console.log('Processing streaming images for IndexedDB storage...');
                                             newImageBatchPromises = event.images.map(async (img: ApiImageResponseItem) => {
                                                 if (img.b64_json) {
                                                     try {
@@ -486,9 +467,6 @@ export default function HomePage() {
                                                         const blob = new Blob([byteArray], { type: actualMimeType });
 
                                                         await db.images.put({ filename: img.filename, blob });
-                                                        console.log(
-                                                            `Saved ${img.filename} to IndexedDB with type ${actualMimeType}.`
-                                                        );
 
                                                         const blobUrl = URL.createObjectURL(blob);
                                                         setBlobUrlCache((prev) => ({
@@ -564,11 +542,8 @@ export default function HomePage() {
                 throw new Error(result.error || `API request failed with status ${response.status}`);
             }
 
-            console.log('API Response:', result);
-
             if (result.images && result.images.length > 0) {
                 durationMs = Date.now() - startTime;
-                console.log(`API call successful. Duration: ${durationMs}ms`);
 
                 let historyQuality: GenerationFormData['quality'] = 'auto';
                 let historyBackground: GenerationFormData['background'] = 'auto';
@@ -611,7 +586,6 @@ export default function HomePage() {
 
                 let newImageBatchPromises: Promise<{ path: string; filename: string } | null>[] = [];
                 if (effectiveStorageModeClient === 'indexeddb') {
-                    console.log('Processing images for IndexedDB storage...');
                     newImageBatchPromises = result.images.map(async (img: ApiImageResponseItem) => {
                         if (img.b64_json) {
                             try {
@@ -626,7 +600,6 @@ export default function HomePage() {
                                 const blob = new Blob([byteArray], { type: actualMimeType });
 
                                 await db.images.put({ filename: img.filename, blob });
-                                console.log(`Saved ${img.filename} to IndexedDB with type ${actualMimeType}.`);
 
                                 const blobUrl = URL.createObjectURL(blob);
                                 setBlobUrlCache((prev) => ({ ...prev, [img.filename]: blobUrl }));
@@ -680,9 +653,6 @@ export default function HomePage() {
     };
 
     const handleHistorySelect = (item: HistoryMetadata) => {
-        console.log(
-            `Selecting history item from ${new Date(item.timestamp).toISOString()}, stored via: ${item.storageModeUsed}`
-        );
         const originalStorageMode = item.storageModeUsed || 'fs';
 
         const selectedBatchPromises = item.images.map(async (imgInfo) => {
@@ -734,12 +704,9 @@ export default function HomePage() {
 
             try {
                 localStorage.removeItem('openaiImageHistory');
-                console.log('Cleared history metadata from localStorage.');
 
                 if (effectiveStorageModeClient === 'indexeddb') {
                     await db.images.clear();
-                    console.log('Cleared images from IndexedDB.');
-
                     setBlobUrlCache({});
                 }
             } catch (e) {
@@ -756,7 +723,6 @@ export default function HomePage() {
 
         const alreadyExists = editImageFiles.some((file) => file.name === filename);
         if (mode === 'edit' && alreadyExists) {
-            console.log(`Image ${filename} already in edit list.`);
             setIsSendingToEdit(false);
             return;
         }
@@ -767,32 +733,25 @@ export default function HomePage() {
             return;
         }
 
-        console.log(`Sending image ${filename} to edit...`);
-
         try {
             let blob: Blob | undefined;
             let mimeType: string = 'image/png';
 
             if (effectiveStorageModeClient === 'indexeddb') {
-                console.log(`Fetching blob ${filename} from IndexedDB...`);
-
                 const record = allDbImages?.find((img) => img.filename === filename);
                 if (record?.blob) {
                     blob = record.blob;
                     mimeType = blob.type || mimeType;
-                    console.log(`Found blob ${filename} in IndexedDB.`);
                 } else {
                     throw new Error(`Image ${filename} not found in local database.`);
                 }
             } else {
-                console.log(`Fetching image ${filename} from API...`);
                 const response = await fetch(`/api/image/${filename}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch image: ${response.statusText}`);
                 }
                 blob = await response.blob();
                 mimeType = response.headers.get('Content-Type') || mimeType;
-                console.log(`Fetched image ${filename} from API.`);
             }
 
             if (!blob) {
@@ -810,8 +769,6 @@ export default function HomePage() {
             if (mode === 'generate') {
                 setMode('edit');
             }
-
-            console.log(`Successfully set ${filename} in edit form.`);
         } catch (err: unknown) {
             console.error('Error sending image to edit:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to send image to edit form.';
@@ -823,24 +780,20 @@ export default function HomePage() {
 
     const executeDeleteItem = async (item: HistoryMetadata) => {
         if (!item) return;
-        console.log(`Executing delete for history item timestamp: ${item.timestamp}`);
-        setError(null); // Clear previous errors
+        setError(null);
 
         const { images: imagesInEntry, storageModeUsed, timestamp } = item;
         const filenamesToDelete = imagesInEntry.map((img) => img.filename);
 
         try {
             if (storageModeUsed === 'indexeddb') {
-                console.log('Deleting from IndexedDB:', filenamesToDelete);
                 await db.images.where('filename').anyOf(filenamesToDelete).delete();
                 setBlobUrlCache((prevCache) => {
                     const newCache = { ...prevCache };
                     filenamesToDelete.forEach((fn) => delete newCache[fn]);
                     return newCache;
                 });
-                console.log('Successfully deleted from IndexedDB and cleared blob cache.');
             } else if (storageModeUsed === 'fs') {
-                console.log('Requesting deletion from filesystem via API:', filenamesToDelete);
                 const apiPayload: { filenames: string[]; passwordHash?: string } = { filenames: filenamesToDelete };
                 if (isPasswordRequiredByBackend && clientPasswordHash) {
                     apiPayload.passwordHash = clientPasswordHash;
@@ -854,10 +807,8 @@ export default function HomePage() {
 
                 const result = await response.json();
                 if (!response.ok) {
-                    console.error('API deletion error:', result);
                     throw new Error(result.error || `API deletion failed with status ${response.status}`);
                 }
-                console.log('API deletion successful:', result);
             }
 
             setHistory((prevHistory) => prevHistory.filter((h) => h.timestamp !== timestamp));

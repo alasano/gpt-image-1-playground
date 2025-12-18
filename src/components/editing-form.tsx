@@ -340,7 +340,6 @@ export function EditingForm({
                 const maskFile = new File([blob], 'generated-mask.png', { type: 'image/png' });
                 setEditGeneratedMaskFile(maskFile);
                 setEditIsMaskSaved(true);
-                console.log('Mask generated and saved to state:', maskFile);
             } else {
                 console.error('Failed to generate mask blob.');
                 setEditIsMaskSaved(false);
